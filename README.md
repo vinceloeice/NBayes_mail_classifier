@@ -1,1 +1,1 @@
-# NBayes_mail_classifier
+Mail classifier using Naive Bayes network.
