@@ -21,8 +21,14 @@ def parser(base_dir, msg_type, verbose=False):
                         cdispo = str(part.get("Content-Disposition"))
 
                         # skip any text/plain (txt) attachments
-                        if ctype == "text/plain" and "attachment" not in cdispo:
-                            body = str(part.get_payload(decode=True).decode("utf-8"))
+                        #if ctype == "text/plain" and "attachment" not in cdispo:
+                        if ctype == "text/plain":
+
+                            if msg_type == 1:
+                                body = str(part.get_payload(decode=1).decode("utf-8"))
+                            elif msg_type == 0:
+                                body = str(part.get_payload(decode=0))
+
                             semi_cleaned = body.replace(
                                     "\n", " "
                                     ).replace(
@@ -32,7 +38,9 @@ def parser(base_dir, msg_type, verbose=False):
                                     ).replace(
                                     "\u200c", " "
                                     ).replace("\t", " ")
-                            parsed_text = semi_cleaned
+                            # God help me
+                            purge_embedded_urls = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', " ", semi_cleaned)
+                            parsed_text = purge_embedded_urls
                             labeled_messages.append((msg_type, parsed_text))
                             break
                 # not multipart - i.e. plain text, no attachments, keeping fingers crossed
